@@ -38,7 +38,7 @@ function init() {
   scene.background = new THREE.Color(0x000000);
 
   camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 100);
-  camera.position.set(0, 1.6, 3);  // Typical standing height
+  camera.position.set(0, 1.6, 3);
 
   renderer = new THREE.WebGLRenderer({ antialias: true });
   renderer.setSize(window.innerWidth, window.innerHeight);
@@ -214,7 +214,7 @@ function createTextLabel(text, width = 1.8, height = 0.3, font = '30px Arial') {
 
 async function fetchPaintings() {
   try{
-    const res = await fetch('http://localhost:5000/paintings');
+    const res = await fetch('https://vr-museum-backend-c601.onrender.com/paintings');
     console.log('painting data', paintingData);
     const result = await res.json();
     paintingData = result.data;
@@ -228,7 +228,7 @@ async function fetchPaintings() {
 async function fetchCatalogPage(page = 1) {
   try{
   const query =encodeURIComponent(searchQuery);
-  const res = await fetch(`http://localhost:5000/paintings?page=${page}&limit=${catalogPageSize}`);
+  const res = await fetch(`https://vr-museum-backend-c601.onrender.com/paintings?page=${page}&limit=${catalogPageSize}`);
   const result = await res.json();
   console.log("Fetched catalog data:", result);
 
