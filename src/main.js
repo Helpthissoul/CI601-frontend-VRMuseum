@@ -103,23 +103,35 @@ function showRoomSelection() {
   const preview1 = createRoomPreview('Room 1', 'assets/room1.png', () => {
     clearRoomSelection();
     loadRoom(1);
-  });
+});
 
   const preview2 = createRoomPreview('Room 2', 'assets/room2.png', () => {
     clearRoomSelection();
     loadRoom(2);
-  });
+});
 
   const label1 = createTextLabel('Room 1 (Minimalistic Room)');
-  const label2 = createTextLabel('Room 2 (Classic Room)');
+  label1.position.set(-1.5, 1.2, -2.99);
+  label1.userData.onClick = () => {
+  clearRoomSelection();
+  loadRoom(1);
+};
+
+const label2 = createTextLabel('Room 2 (Classic Room)');
+  label2.position.set(1.5, 1.2, -2.99);
+  label2.userData.onClick = () => {
+  clearRoomSelection();
+  loadRoom(2);
+};
+
   const roomTitleLabel = createTextLabel('Select a Room', 2.5, 0.4, 'bold 60px Georgia');
   roomTitleLabel.position.set(0.15, 2.5, -3);
   
 
   preview1.position.set(-1.5, 1.6, -3);
   preview2.position.set(1.5, 1.6, -3);
-  label1.position.set(-1.5, 1.2, -3);
-  label2.position.set(1.5, 1.2, -3);
+  label1.position.set(-1.5, 1.2, -2.95);
+  label2.position.set(1.5, 1.2, -2.95);
 
   scene.add(preview1, preview2, label1, label2, roomTitleLabel);
 
@@ -260,12 +272,6 @@ function displayPaintings(){
 
     scene.add(frame);
     paintingFrames.push(frame);
-
-    const title = createTextMesh(painting.title || 'Untitled');
-    title.position.set(frame.position.x, frame.position.y + 0.8, frame.position.z + 0.1);
-    scene.add(title);
-    paintingLabels.push(title);
-
   });
 
 }
@@ -373,7 +379,7 @@ function onSelect(event){
     infoCard.material.transparent = true;
     infoCard.material.opacity = 0;
 
-    const rightOffset = new THREE.Vector3(1.8, 0, 0);
+    const rightOffset = new THREE.Vector3(2, 0, 0);
     selected.updateMatrixWorld();
     const worldRight = rightOffset.applyMatrix4(selected.matrixWorld.clone().extractRotation(selected.matrixWorld));
     const finalCardPos = selected.position.clone().add(worldRight).add(new THREE.Vector3(0, 0, 0));
@@ -446,8 +452,9 @@ function showCatalog() {
   const yearHeader = createCatalogHeaderCell('Year', 1.6, headerY);
   catalogGroup.add(titleHeader, artistHeader, yearHeader);
 
+  //Search bar
   const searchBar = createTextInputBox("Search...");
-  searchBar.position.set(0, headerY + 0.6, 0);
+  searchBar.position.set(0, headerY + 0.6, -2.5);
   searchBar.position.z = 0.01;
 
   searchBar.userData.isSearchInput = true;
@@ -540,11 +547,6 @@ function updateWallFrame(painting) {
 
   scene.add(frame);
   paintingFrames.push(frame);
-
-  const title = createTextMesh(painting.title || 'Untitled');
-  title.position.set(frame.position.x, frame.position.y + 0.8, frame.position.z + 0.1);
-  scene.add(title);
-  paintingLabels.push(title);
 }
 
 function updateSearchInputBox(inputBox, text) {
@@ -646,8 +648,8 @@ function hideMenu() {
 }
 
 function createInfoCard(data) {
-    const canvas = document.createElement('canvas');
-  canvas.width = 512;
+  const canvas = document.createElement('canvas');
+  canvas.width = 900;
   canvas.height = 256;
   const ctx = canvas.getContext('2d');
 
@@ -661,20 +663,7 @@ function createInfoCard(data) {
 
   const texture = new THREE.CanvasTexture(canvas);
   const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
-  const geometry = new THREE.PlaneGeometry(1.8, 0.9);
-  return new THREE.Mesh(geometry, material);
-}
-
-function createTextMesh(text) {
-  const canvas = document.createElement('canvas');
-  const context = canvas.getContext('2d');
-  context.font = '30px Arial';
-  context.fillStyle = 'white';
-  context.fillText(text, 10, 40);
-
-  const texture = new THREE.CanvasTexture(canvas);
-  const material = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide, transparent: true });
-  const geometry = new THREE.PlaneGeometry(1.5, 0.3);
+  const geometry = new THREE.PlaneGeometry(3, 0.9);
   return new THREE.Mesh(geometry, material);
 }
 
@@ -758,6 +747,26 @@ function animate() {
     renderer.render(scene, camera);
 }
 
+function createKeyLabel(char, width = 0.4, height = 0.4) {
+  const canvas = document.createElement('canvas');
+  canvas.width = 256;
+  canvas.height = 256;
+  const ctx = canvas.getContext('2d');
+
+  ctx.fillStyle = 'rgba(30, 30, 30, 1)';
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = 'white';
+  ctx.font = 'bold 100px Arial';
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(char, canvas.width / 2, canvas.height / 2);
+
+  const texture = new THREE.CanvasTexture(canvas);
+  const material = new THREE.MeshBasicMaterial({ map: texture, transparent: true });
+  const geometry = new THREE.PlaneGeometry(width, height);
+  return new THREE.Mesh(geometry, material);
+}
+
 function showVirtualKeyboard(targetInputBox) {
   if (keyboardGroup) scene.remove(keyboardGroup);
   keyboardGroup = new THREE.Group();
@@ -779,7 +788,7 @@ function showVirtualKeyboard(targetInputBox) {
       col = 0;
     }
 
-    const key = createTextLabel(char, keySize, 0.4);
+    const key = createKeyLabel(char, keySize, 0.4);
     key.position.set((col - 5) * spacing, 0.8 - row * spacing, 0);
     key.userData.char = char;
     key.userData.onClick = () => {
@@ -804,7 +813,8 @@ function showVirtualKeyboard(targetInputBox) {
     col++;
   });
 
-  keyboardGroup.position.set(0, 0.6, -2.8);
+  keyboardGroup.scale.set(0.5, 0.5, 0.5);
+  keyboardGroup.position.set(0, 0.6, -2.5);
   keyboardGroup.lookAt(camera.position);
   scene.add(keyboardGroup);
 }
